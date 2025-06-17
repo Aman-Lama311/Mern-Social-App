@@ -86,7 +86,7 @@ const LeftBar = () => {
               >
                 <span>{item.icon}</span>
                 {/* Hide text on 2xl+ */}
-                <span className="hidden 2xl:inline">{item.text}</span>
+                <span className="hidden lg:block">{item.text}</span>
               </div>
             ))}
           </div>
