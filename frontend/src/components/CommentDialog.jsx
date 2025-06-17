@@ -38,7 +38,9 @@ const CommentDialog = ({ open, setOpen }) => {
     }
     try {
       const res = await axios.post(
-        `http://localhost:8000/api/v1/post/${selectedPost?._id}/comment`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/post/${
+          selectedPost?._id
+        }/comment`,
         { text },
         {
           headers: {

@@ -36,7 +36,7 @@ const CreatePost = ({ open, setOpen }) => {
     try {
       setLoading(true);
       const res = await axios.post(
-        "http://localhost:8000/api/v1/post/addpost",
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/post/addpost`,
         formData,
         {
           headers: {
@@ -48,7 +48,7 @@ const CreatePost = ({ open, setOpen }) => {
       if (res.data.success) {
         // Refetching all posts after creation
         const getRes = await axios.get(
-          "http://localhost:8000/api/v1/post/all",
+          `${import.meta.env.VITE_BACKEND_URL}/api/v1/post/all`,
           {
             withCredentials: true,
           }
