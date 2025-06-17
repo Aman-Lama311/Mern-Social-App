@@ -23,8 +23,8 @@ app.use(cookieParser());
 app.use(urlencoded({ extended: true }));
 app.use(
   cors({
-    origin: "https://mern-social-app-iota.vercel.app", // ❌ remove trailing slash
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // ✅ allow preflight
+    origin: "https://mern-social-app-iota.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true,
   })
 );
