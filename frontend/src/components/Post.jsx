@@ -22,11 +22,7 @@ const Post = ({ post }) => {
 
   const handleTextChange = (e) => {
     const value = e.target.value;
-    if (value.trim()) {
-      setText(value);
-    } else {
-      setText("");
-    }
+    setText(value.trim() ? value : "");
   };
 
   const likeOrDislikePostHandler = async () => {
@@ -42,8 +38,6 @@ const Post = ({ post }) => {
         const updatedLikes = liked ? postLikes - 1 : postLikes + 1;
         setPostLikes(updatedLikes);
         setLiked(!liked);
-
-        // Update the post in the Redux store
         const updatedPostsData = posts.map((p) =>
           p._id === post._id
             ? {
@@ -68,17 +62,13 @@ const Post = ({ post }) => {
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/post/${post?._id}/comment`,
         { text },
         {
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
       if (res.data.success) {
         const updatedComments = [...comments, res.data.comment];
         setComments(updatedComments);
-
-        // Update the post in the Redux store
         const updatedPostData = posts.map((p) =>
           p._id === post._id ? { ...p, comments: updatedComments } : p
         );
@@ -98,9 +88,7 @@ const Post = ({ post }) => {
         { withCredentials: true }
       );
       if (res.data.success) {
-        const updatedPosts = posts.filter(
-          (postItem) => postItem?._id !== post?._id
-        );
+        const updatedPosts = posts.filter((item) => item?._id !== post?._id);
         dispatch(setPosts(updatedPosts));
         toast.success(res.data.message);
       }
@@ -119,42 +107,45 @@ const Post = ({ post }) => {
         toast.success(res.data.message);
       }
     } catch (error) {
-      console.log(error);
       toast.error(error.response.data.message);
     }
   };
 
   return (
-    <div className="w-full max-w-md mx-auto border-b border-zinc-800 py-2">
-      {/* Post header */}
+    <div className="w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl mx-auto border-b border-zinc-800 p-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 py-3">
-          <Avatar className="w-8 h-8">
+        <div className="flex items-center gap-3">
+          <Avatar className="w-9 h-9 sm:w-10 sm:h-10">
             <AvatarImage src={post.author?.profilePicture} />
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex items-baseline gap-2">
-            <h1>{post.author?.username}</h1>
-            {user && user?._id === post?.author._id && <Badge>Author</Badge>}
+            <h1 className="text-sm sm:text-base font-semibold">
+              {post.author?.username}
+            </h1>
+            {user && user?._id === post?.author._id && (
+              <Badge className="text-xs">Author</Badge>
+            )}
           </div>
         </div>
-        {/* Dialog box */}
+        {/* Options */}
         <Dialog>
           <DialogTrigger asChild>
-            <MoreHorizontal className="cursor-pointer" />
+            <MoreHorizontal className="cursor-pointer hover:text-gray-400" />
           </DialogTrigger>
-          <DialogContent
-            className={
-              "flex flex-col text-center bg-[#262626] border-none outline-none p-0 w-96"
-            }
-          >
-            <ul className="text-sm">
-              <li className="text-[#ED4956] font-bold">Unfollow</li>
-              <li className="border-t border-zinc-600">Add to favorites</li>
+          <DialogContent className="flex flex-col bg-[#262626] border-none outline-none p-0 w-full sm:w-96 text-sm">
+            <ul>
+              <li className="text-[#ED4956] font-bold cursor-pointer py-2">
+                Unfollow
+              </li>
+              <li className="border-t border-zinc-600 py-2">
+                Add to favorites
+              </li>
               {user && user?._id === post?.author._id && (
                 <li
                   onClick={deletePostHandler}
-                  className="border-t border-zinc-600 "
+                  className="border-t border-zinc-600 py-2 cursor-pointer text-red-500"
                 >
                   Delete post
                 </li>
@@ -163,27 +154,30 @@ const Post = ({ post }) => {
           </DialogContent>
         </Dialog>
       </div>
-      {/* Post image */}
-      <img
-        className="rounded aspect-square object-cover w-full"
-        src={post.image}
-        alt="car_image"
-      />
-      {/* Post footer likes comments and share */}
 
+      {/* Post image */}
+      <div className="mt-3">
+        <img
+          src={post.image}
+          alt="post_img"
+          className="w-full object-cover rounded-md aspect-square"
+        />
+      </div>
+
+      {/* Footer - Like, Comment, Share */}
       <div className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-3">
+        <div className="flex gap-4 items-center">
           {liked ? (
             <FaHeart
               onClick={likeOrDislikePostHandler}
-              size={24}
-              className="cursor-pointer text-[#FF3040]"
+              size={22}
+              className="text-[#FF3040] cursor-pointer"
             />
           ) : (
             <FaRegHeart
               onClick={likeOrDislikePostHandler}
-              size={24}
-              className="cursor-pointer hover:text-gray-600"
+              size={22}
+              className="hover:text-gray-600 cursor-pointer"
             />
           )}
           <MessageCircle
@@ -191,46 +185,54 @@ const Post = ({ post }) => {
               dispatch(setSelectedPost(post));
               setOpen(true);
             }}
-            className="cursor-pointer hover:text-[#808080]"
+            className="cursor-pointer hover:text-gray-500"
           />
-          <Send className="cursor-pointer hover:text-[#808080]" />
+          <Send className="cursor-pointer hover:text-gray-500" />
         </div>
         <Bookmark
           onClick={bookmarkHandler}
-          className="cursor-pointer hover:text-[#808080]"
+          className="cursor-pointer hover:text-gray-500"
         />
       </div>
-      <span className="font-medium text-sm block mb-3">{postLikes} likes</span>
-      <p className="space-x-2 text-sm font-medium">
-        <strong>{post.author?.username}</strong>
-        <span>{post.caption}</span>
+
+      {/* Likes count */}
+      <p className="text-sm font-semibold mb-1">{postLikes} likes</p>
+
+      {/* Caption */}
+      <p className="text-sm mb-1">
+        <strong>{post.author?.username}</strong>{" "}
+        <span className="text-gray-300">{post.caption}</span>
       </p>
+
+      {/* View Comments */}
       {comments.length > 0 && (
-        <span
+        <p
           onClick={() => {
             dispatch(setSelectedPost(post));
             setOpen(true);
           }}
-          className="text-sm  text-[#808080] cursor-pointer"
+          className="text-sm text-gray-400 cursor-pointer"
         >
           View all {comments.length} comments
-        </span>
+        </p>
       )}
 
+      {/* Comment Dialog */}
       <CommentDialog open={open} setOpen={setOpen} />
-      {/* comment input */}
-      <div className="flex items-center gap-2 py-2">
+
+      {/* Comment input */}
+      <div className="flex items-center gap-3 mt-3">
         <input
-          className="text-sm outline-none w-full"
           type="text"
           value={text}
           onChange={handleTextChange}
           placeholder="Add a comment..."
+          className="flex-1 text-sm bg-transparent focus:outline-none"
         />
         {text && (
           <span
             onClick={commentHandler}
-            className="text-sm font-medium cursor-pointer"
+            className="text-sm text-blue-500 font-medium cursor-pointer"
           >
             Post
           </span>
@@ -239,4 +241,5 @@ const Post = ({ post }) => {
     </div>
   );
 };
+
 export default Post;
