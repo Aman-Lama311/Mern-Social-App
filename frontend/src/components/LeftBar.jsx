@@ -66,10 +66,15 @@ const LeftBar = () => {
     { icon: <LogOut size={24} />, text: "Logout" },
   ];
 
+  // Items to show in mobile bottom nav
+  const bottomItems = sidebarItems.filter((item) =>
+    ["Home", "Create", "Profile", "Logout", "Notifications"].includes(item.text)
+  );
+
   return (
     <>
       {/* Sidebar for md and up */}
-      <div className="hidden md:flex fixed top-0 left-0 h-screen max-w-[250px] px-4 py-6 border-r border-zinc-800 bg-black z-10 flex-col justify-between">
+      <div className="hidden md:flex fixed top-0 left-0 h-screen max-w-[250px] 2xl:w-[250px] px-4 py-6 border-r border-zinc-800 bg-black z-10 flex-col justify-between">
         <div>
           <h1 className="text-2xl handwriting px-2 py-4 mb-6">Instagram</h1>
           <div className="flex flex-col gap-4">
@@ -91,7 +96,7 @@ const LeftBar = () => {
       {/* Bottom nav for mobile */}
       <div className="md:hidden fixed bottom-0 w-full bg-black border-t border-zinc-800 z-20">
         <div className="flex justify-around items-center h-14">
-          {sidebarItems.slice(0, 5).map((item, index) => (
+          {bottomItems.map((item, index) => (
             <div
               key={index}
               onClick={() => handleClick(item.text)}
