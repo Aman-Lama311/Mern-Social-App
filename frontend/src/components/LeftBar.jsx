@@ -74,7 +74,7 @@ const LeftBar = () => {
   return (
     <>
       {/* Sidebar for md and up */}
-      <div className="hidden md:flex fixed top-0 left-0 h-screen max-w-[250px] 2xl:w-[250px] px-4 py-6 border-r border-zinc-800 bg-black z-10 flex-col justify-between">
+      <div className="hidden md:flex fixed top-0 left-0 h-screen w-[150px] lg:w-[250px] px-4 py-6 border-r border-zinc-800 bg-black z-10 flex-col justify-between">
         <div>
           <h1 className="text-2xl handwriting px-2 py-4 mb-6">Instagram</h1>
           <div className="flex flex-col gap-4">

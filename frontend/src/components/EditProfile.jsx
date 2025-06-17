@@ -51,12 +51,11 @@ const EditProfile = () => {
     formData.append("gender", input.gender);
 
     if (input.profilePhoto instanceof File) {
-      formData.append("profilePicture", input.profilePhoto); // correct field name
+      formData.append("profilePicture", input.profilePhoto);
     }
 
     try {
       setLoading(true);
-
       const res = await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/profile/edit`,
         formData,
@@ -88,23 +87,27 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="flex max-w-2xl my-10 mx-auto pl-10">
-      <section className="flex flex-col gap-6 w-full">
-        <h1 className="font-bold text-xl">Edit Profile</h1>
+    <div className="w-full flex justify-center px-4 sm:px-6 md:px-10 py-8">
+      <section className="w-full max-w-2xl flex flex-col gap-6">
+        <h1 className="font-bold text-2xl text-center sm:text-left">
+          Edit Profile
+        </h1>
 
-        {/* Change photo */}
-        <div className="flex items-center justify-between p-2 bg-zinc-800 rounded-md">
-          <div className="flex items-center gap-2">
-            <Avatar>
-              <AvatarImage className="w-10 h-10" src={user?.profilePicture} />
+        {/* Change Photo Section */}
+        <div className="flex flex-col sm:flex-row items-center sm:items-start justify-between gap-4 p-4 bg-zinc-800 rounded-md">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Avatar className="w-12 h-12">
+              <AvatarImage src={user?.profilePicture} />
               <AvatarFallback>{user?.username?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div>
-              <h1>{user?.username}</h1>
-              <span>{user?.bio || "bio..."}</span>
+              <h1 className="font-semibold">{user?.username}</h1>
+              <span className="text-sm text-gray-400">
+                {user?.bio || "bio..."}
+              </span>
             </div>
           </div>
-          <div>
+          <div className="w-full sm:w-auto text-center">
             <input
               onChange={fileChangeHandler}
               ref={imageRef}
@@ -114,27 +117,28 @@ const EditProfile = () => {
             />
             <Button
               onClick={() => imageRef.current.click()}
-              className="cursor-pointer"
+              className="cursor-pointer w-full sm:w-auto"
             >
               Change Photo
             </Button>
           </div>
         </div>
 
-        {/* Bio */}
-        <div>
+        {/* Bio Input */}
+        <div className="flex flex-col">
           <h1 className="font-semibold text-lg mb-2">Bio</h1>
           <Textarea
             value={input.bio}
             onChange={(e) =>
               setInput((prev) => ({ ...prev, bio: e.target.value }))
             }
-            className="focus-visible:ring-transparent"
+            className="focus-visible:ring-transparent min-h-[100px]"
+            placeholder="Write something about yourself..."
           />
         </div>
 
-        {/* Gender */}
-        <div>
+        {/* Gender Selection */}
+        <div className="flex flex-col">
           <h1 className="font-semibold text-lg mb-2">Gender</h1>
           <Select
             defaultValue={input.gender}
@@ -148,17 +152,18 @@ const EditProfile = () => {
                 <SelectLabel>Gender</SelectLabel>
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
         </div>
 
-        {/* Submit */}
+        {/* Submit Button */}
         <div className="flex justify-end">
           <Button
             onClick={editProfileHandler}
-            className="cursor-pointer"
             disabled={loading}
+            className="min-w-[120px]"
           >
             {loading ? (
               <>
