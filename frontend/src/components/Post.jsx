@@ -145,7 +145,7 @@ const Post = ({ post }) => {
               {user && user?._id === post?.author._id && (
                 <li
                   onClick={deletePostHandler}
-                  className="border-t border-zinc-600 py-2 cursor-pointer text-[#ED4956]"
+                  className="border-t border-zinc-600 py-2 cursor-pointer text-[#ED4956] hover:text-[#ed4957e9]"
                 >
                   Delete post
                 </li>
