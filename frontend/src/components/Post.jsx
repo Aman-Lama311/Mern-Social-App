@@ -135,7 +135,7 @@ const Post = ({ post }) => {
             <MoreHorizontal className="cursor-pointer hover:text-gray-400" />
           </DialogTrigger>
           <DialogContent className="flex flex-col bg-[#262626] border-none outline-none p-0 w-full sm:w-96 text-sm">
-            <ul>
+            <ul className="text-center">
               <li className="text-[#ED4956] font-bold cursor-pointer py-2">
                 Unfollow
               </li>
@@ -145,7 +145,7 @@ const Post = ({ post }) => {
               {user && user?._id === post?.author._id && (
                 <li
                   onClick={deletePostHandler}
-                  className="border-t border-zinc-600 py-2 cursor-pointer text-red-500"
+                  className="border-t border-zinc-600 py-2 cursor-pointer text-[#ED4956]"
                 >
                   Delete post
                 </li>
