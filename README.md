@@ -1,73 +1,79 @@
-MERN Instagram Clone
-A full-stack Instagram-like social media application built using the MERN stack (MongoDB, Express.js, React.js, Node.js). Users can create posts, like and comment on them, bookmark posts, and manage their profiles with secure authentication.
+📸 MERN Instagram Clone
+A full-stack Instagram-like social media application built using the MERN stack (MongoDB, Express.js, React, Node.js). Users can create and interact with posts, manage their profiles, and connect with others — all within a clean and responsive interface.
 
-Features
-User authentication with JWT
+🌐 Live Demo
+🔗 View Live App : (https://mern-social-app-iota.vercel.app/)
 
-Create, update, and delete posts
+🚀 Features
+🔐 JWT-based User Authentication
 
-Like and comment on posts
+📝 Create / Update / Delete Posts
 
-Bookmark and unbookmark posts
+❤️ Like & Comment on Posts
 
-Manage user profiles (edit bio, upload profile picture)
+🔖 Bookmark / Unbookmark Posts
 
-Follow/unfollow users
+🙍 Edit Profile Info & Upload Profile Picture
 
-Image upload using Multer and Cloudinary
+📤 Image Upload using Multer & Cloudinary
 
-Global state management using Redux Toolkit
+🌍 Global State with Redux Toolkit
 
-Fully responsive UI
+📱 Fully Responsive UI
 
-Tech Stack
-Frontend:
-
+🛠️ Tech Stack
+Frontend
 React.js
 
 Redux Toolkit
 
+Shadcn UI
+
 Axios
 
-Tailwind CSS (or your preferred CSS framework)
+Tailwind CSS
 
-Backend:
-
+Backend
 Node.js
 
 Express.js
 
-MongoDB with Mongoose
+MongoDB (with Mongoose)
 
-JWT for authentication
+JWT for Auth
 
-Multer for image handling
+Multer (Image Upload)
 
-Cloudinary for image storage
+Cloudinary (Image Storage)
 
-Getting Started
-Prerequisites
+dotenv for Config
+
+📷 Screenshots
+HomePage: https://github.com/Aman-Lama311/Mern-Social-App/issues/1
+LoginPage: https://github.com/Aman-Lama311/Mern-Social-App/issues/2
+
+
+
+🧪 Getting Started
+📦 Prerequisites
 Node.js and npm installed
 
-MongoDB setup (local or cloud)
+MongoDB (Local or Atlas)
 
-Cloudinary account for image storage
+Cloudinary Account
 
-Installation
-Clone the repository:
-
+🔧 Installation
+1. Clone the repository:
 bash
 Copy
 Edit
-git clone https://github.com/yourusername/mern-insta-clone.git
-Navigate to the project directory:
-
+git clone https://github.com/Aman-Lama311/Mern-Social-App.git
+2. Navigate to the project folder:
 bash
 Copy
 Edit
 cd mern-insta-clone
-Install dependencies:
-
+3. Install dependencies:
 Frontend:
 
 bash
@@ -82,9 +88,8 @@ Copy
 Edit
 cd ../backend
 npm install
-Create .env files in both the frontend and backend folders with the required environment variables.
-
-Backend .env example:
+🔐 Environment Variables
+Create a .env file inside the /backend folder:
 
 ini
 Copy
@@ -92,33 +97,42 @@ Edit
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
 SECRET_KEY=your_jwt_secret
+
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret
-Start the development servers:
+If needed, you can also add a .env in /frontend for base URLs or keys.
 
-Backend:
+▶️ Running the App
+Start Backend Server:
 
 bash
 Copy
 Edit
 cd backend
 npm run dev
-Frontend:
+Start Frontend Dev Server:
 
 bash
 Copy
 Edit
-cd frontend
+cd ../frontend
 npm run dev
-Folder Structure
+📁 Folder Structure
 php
 Copy
 Edit
 mern-insta-clone/
-├── frontend/        # React frontend
-├── backend/         # Express backend
+├── frontend/       # React + Redux frontend
+├── backend/        # Express + MongoDB backend
 └── README.md
-License
+📝 License
+This project is open-source and free to use for learning and development.
+
+📩 Contact
+Made with 💙 by Aman Lama
+📧 lamsaman285@gmail.com
+🌐 LinkedIn
+💻 GitHub
 This project is open source and free to use for learning and development purposes.
 
