@@ -188,16 +188,29 @@ export const editProfile = async (req, res) => {
 
 export const suggestedUsers = async (req, res) => {
   try {
-    const suggestedUsers = await User.find({
-      _id: { $ne: req.id },
-    }).select("-password");
+    const currentUserId = req.id;
 
-    if (!suggestedUsers) {
+    // get logged in user's following list
+    const currentUser = await User.findById(currentUserId).select("following");
+
+    if (!currentUser) {
       return res.status(404).json({
-        message: "No suggested users found",
+        message: "User not found",
         success: false,
       });
     }
+
+    const users = await User.find({
+      _id: { $ne: currentUserId },
+    })
+      .select("username profilePicture bio")
+      .lean();
+
+    const suggestedUsers = users.map((user) => ({
+      ...user,
+      isFollowing: currentUser.following.includes(user._id.toString()),
+    }));
+
     return res.status(200).json({
       success: true,
       users: suggestedUsers,
@@ -213,16 +226,18 @@ export const suggestedUsers = async (req, res) => {
 
 export const followorUnfollow = async (req, res) => {
   try {
-    const followgarneId = req.id;
-    const jaslaiFollowgarneId = req.params.id;
-    if (followgarneId === jaslaiFollowgarneId) {
+    const followerId = req.id;
+    const targetUserId = req.params.id;
+
+    if (followerId === targetUserId) {
       return res.status(400).json({
         message: "You cannot follow yourself",
         success: false,
       });
     }
-    const user = await User.findById(followgarneId);
-    const targetUser = await User.findById(jaslaiFollowgarneId);
+
+    const user = await User.findById(followerId);
+    const targetUser = await User.findById(targetUserId);
 
     if (!user || !targetUser) {
       return res.status(404).json({
@@ -230,41 +245,44 @@ export const followorUnfollow = async (req, res) => {
         success: false,
       });
     }
-    // Check if the user is already following the target user
-    const isFollowing = user.following.includes(jaslaiFollowgarneId);
+
+    const isFollowing = user.following.includes(targetUserId);
+
     if (isFollowing) {
-      //unfollow the target user logic
       await Promise.all([
         User.updateOne(
-          { _id: followgarneId },
-          { $pull: { following: jaslaiFollowgarneId } }
+          { _id: followerId },
+          { $pull: { following: targetUserId } }
         ),
         User.updateOne(
-          { _id: jaslaiFollowgarneId },
-          { $pull: { followers: followgarneId } }
+          { _id: targetUserId },
+          { $pull: { followers: followerId } }
         ),
       ]);
 
       return res.status(200).json({
-        message: "Unfollowed successfully",
         success: true,
+        message: "Unfollowed successfully",
+        isFollowing: false,
+        userId: targetUserId,
       });
     } else {
-      //follow the target user logic
       await Promise.all([
         User.updateOne(
-          { _id: followgarneId },
-          { $push: { following: jaslaiFollowgarneId } }
+          { _id: followerId },
+          { $push: { following: targetUserId } }
         ),
         User.updateOne(
-          { _id: jaslaiFollowgarneId },
-          { $push: { followers: followgarneId } }
+          { _id: targetUserId },
+          { $push: { followers: followerId } }
         ),
       ]);
 
       return res.status(200).json({
-        message: "Followed successfully",
         success: true,
+        message: "Followed successfully",
+        isFollowing: true,
+        userId: targetUserId,
       });
     }
   } catch (error) {

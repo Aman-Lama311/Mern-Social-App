@@ -1,9 +1,62 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useDispatch } from "react-redux";
+import { followUser } from "../redux/authSlice";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 const SuggestedUsers = () => {
   const { suggestedUsers } = useSelector((store) => store.auth);
+
+  const dispatch = useDispatch();
+
+  const handleFollow = async (userId) => {
+    // Optimistic update
+    const currentFollowState = suggestedUsers.find(
+      (u) => u._id === userId
+    )?.isFollowing;
+    dispatch(
+      followUser({
+        userId,
+        isFollowing: !currentFollowState,
+      })
+    );
+
+    try {
+      const res = await axios.post(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/v1/user/followOrUnfollow/${userId}`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (!res.data.success) {
+        // rollback if failed
+        dispatch(
+          followUser({
+            userId,
+            isFollowing: currentFollowState,
+          })
+        );
+        toast.error("Failed to follow user");
+        return;
+      }
+
+      toast.success(res.data.message);
+    } catch (error) {
+      // rollback if error
+      dispatch(
+        followUser({
+          userId,
+          isFollowing: currentFollowState,
+        })
+      );
+      toast.error("Failed to follow user");
+      console.error("Error following user:", error);
+    }
+  };
 
   return (
     <div className="mt-6 space-y-4">
@@ -40,8 +93,15 @@ const SuggestedUsers = () => {
                 </p>
               </div>
             </div>
-            <span className="text-sm font-semibold text-[#0095F6] hover:text-zinc-300 cursor-pointer">
-              Follow
+            <span
+              onClick={() => handleFollow(user._id)}
+              className={`text-sm font-semibold cursor-pointer ${
+                user.isFollowing
+                  ? "text-gray-400"
+                  : "text-[#0095F6] hover:text-zinc-300"
+              }`}
+            >
+              {user.isFollowing ? "Following" : "Follow"}
             </span>
           </div>
         ))}

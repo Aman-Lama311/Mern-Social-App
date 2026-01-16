@@ -1,26 +1,57 @@
 import { Link, useParams } from "react-router-dom";
 import useGetUserProfile from "../hooks/useGetUserProfile";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { AtSign, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { FaHeart } from "react-icons/fa";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { setUserProfile } from "../redux/authSlice";
 
 const Profile = () => {
-  const params = useParams();
-  const userId = params.id;
-  useGetUserProfile(userId);
+  const { id: profileUserId } = useParams();
+  useGetUserProfile(profileUserId);
+
+  const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState("posts");
 
   const { userProfile, user } = useSelector((store) => store.auth);
 
-  const isLogedInUser = user?._id === userProfile?._id;
-  const isFollowing = true;
+  const isLoggedInUser = user?._id === userProfile?._id;
+  const isFollowing = userProfile?.followers?.includes(user?._id);
 
-  const handleTabChnage = (tab) => {
-    setActiveTab(tab);
+  const handleFollow = async () => {
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/v1/user/followOrUnfollow/${
+          userProfile._id
+        }`,
+        {},
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        toast.success(res.data.message);
+
+        // ✅ IMMUTABLE redux update
+        const updatedFollowers = res.data.isFollowing
+          ? [...userProfile.followers, user._id]
+          : userProfile.followers.filter((id) => id !== user._id);
+
+        dispatch(
+          setUserProfile({
+            ...userProfile,
+            followers: updatedFollowers,
+          })
+        );
+      }
+    } catch (error) {
+      toast.error("Failed to follow/unfollow user");
+      console.error(error);
+    }
   };
 
   const displayedPost =
@@ -33,32 +64,33 @@ const Profile = () => {
         <div className="flex flex-col md:flex-row items-center md:items-start gap-8 px-4">
           {/* Avatar */}
           <div className="flex justify-center md:w-1/3">
-            <Avatar className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32">
-              <AvatarImage
-                src={userProfile?.profilePicture}
-                alt="profilePhoto"
-              />
+            <Avatar className="w-32 h-32">
+              <AvatarImage src={userProfile?.profilePicture} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </div>
 
           {/* Profile Info */}
           <div className="flex flex-col md:w-2/3 gap-4">
-            {/* Username and buttons */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
-              <span className="text-xl sm:text-2xl font-semibold">
+            {/* Username & Buttons */}
+            <div className="flex items-center gap-4">
+              <span className="text-2xl font-semibold">
                 {userProfile?.username}
               </span>
-              {isLogedInUser ? (
+
+              {isLoggedInUser ? (
                 <>
                   <Link to="/account/edit">
                     <Button size="sm">Edit profile</Button>
                   </Link>
                   <Button size="sm">View archive</Button>
                 </>
-              ) : isFollowing ? (
+              ) : (
                 <>
-                  <Button size="sm">Unfollow</Button>
+                  <Button onClick={handleFollow} size="sm">
+                    {isFollowing ? "Unfollow" : "Follow"}
+                  </Button>
+
                   <Button
                     size="sm"
                     className="bg-[#0095F6] text-white hover:bg-[#0095F6]/90"
@@ -66,70 +98,51 @@ const Profile = () => {
                     Message
                   </Button>
                 </>
-              ) : (
-                <Button
-                  size="sm"
-                  className="bg-[#0095F6] text-white hover:bg-[#0095F6]/90"
-                >
-                  Message
-                </Button>
               )}
             </div>
 
             {/* Stats */}
-            <div className="flex gap-5 text-sm sm:text-base">
+            <div className="flex gap-6">
               <p>
-                <span className="font-semibold">
-                  {userProfile?.posts?.length || 0}
-                </span>{" "}
-                posts
+                <b>{userProfile?.posts?.length || 0}</b> posts
               </p>
               <p>
-                <span className="font-semibold">
-                  {userProfile?.followers?.length || 0}
-                </span>{" "}
-                followers
+                <b>{userProfile?.followers?.length || 0}</b> followers
               </p>
               <p>
-                <span className="font-semibold">
-                  {userProfile?.following?.length || 0}
-                </span>{" "}
-                following
+                <b>{userProfile?.following?.length || 0}</b> following
               </p>
             </div>
 
-            {/* Bio and Info */}
+            {/* Bio */}
             <div className="flex flex-col gap-1">
               <p className="font-medium">{userProfile?.bio || "bio..."}</p>
               <Badge className="w-fit gap-1">
                 <AtSign className="w-4 h-4" />
                 {userProfile?.username}
               </Badge>
-              <span className="text-sm">🧑‍🏫Learning fullstack development</span>
-              <span className="text-sm">🧑‍💻 Building side projects</span>
-              <span className="text-sm">🌱 Improving daily</span>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
         <div className="border-t border-zinc-800">
-          <div className="flex justify-center gap-8 text-sm sm:text-base">
+          <div className="flex justify-center gap-8">
             <span
-              onClick={() => handleTabChnage("posts")}
-              className={`py-3 px-2 sm:px-4 cursor-pointer ${
+              onClick={() => setActiveTab("posts")}
+              className={`py-3 cursor-pointer ${
                 activeTab === "posts"
-                  ? "border-b-2 border-white font-medium"
+                  ? "border-b-2 border-white"
                   : "text-gray-400"
               }`}
             >
               POSTS
             </span>
             <span
-              onClick={() => handleTabChnage("saved")}
-              className={`py-3 px-2 sm:px-4 cursor-pointer ${
+              onClick={() => setActiveTab("saved")}
+              className={`py-3 cursor-pointer ${
                 activeTab === "saved"
-                  ? "border-b-2 border-white font-medium"
+                  ? "border-b-2 border-white"
                   : "text-gray-400"
               }`}
             >
@@ -139,34 +152,30 @@ const Profile = () => {
         </div>
 
         {/* Post Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1 px-2 sm:px-0">
-          {displayedPost?.length > 0 ? (
+        <div className="grid grid-cols-3 gap-1">
+          {displayedPost?.length ? (
             displayedPost.map((post) => (
               <div
                 key={post._id}
-                className="relative group cursor-pointer aspect-square overflow-hidden"
+                className="relative group aspect-square overflow-hidden"
               >
                 <img
-                  src={post?.image}
-                  alt="post"
+                  src={post.image}
+                  alt=""
                   className="w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-50 transition-opacity duration-200 flex items-center justify-center">
-                  <div className="flex items-center gap-4 text-white">
-                    <Button className="bg-transparent text-white hover:bg-transparent flex items-center gap-1">
-                      <FaHeart />
-                      <span>{post?.likes?.length || 0}</span>
-                    </Button>
-                    <Button className="bg-transparent text-white hover:bg-transparent flex items-center gap-1">
-                      <MessageCircle className="w-4 h-4" />
-                      <span>{post?.comments?.length || 0}</span>
-                    </Button>
-                  </div>
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex justify-center items-center gap-6 text-white">
+                  <span className="flex items-center gap-1">
+                    <FaHeart /> {post.likes?.length || 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MessageCircle size={16} /> {post.comments?.length || 0}
+                  </span>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-center col-span-2 sm:col-span-3 text-gray-400 py-10">
+            <p className="col-span-3 text-center text-gray-400 py-10">
               No posts to display
             </p>
           )}
